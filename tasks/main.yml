@@ -1,0 +1,7 @@
+---
+- name: 'Prep'
+  ansible.builtin.import_tasks: 'prep.yml'
+
+- name: 'Install'
+  when: imapsync_flg_install
+  ansible.builtin.import_tasks: 'install.yml'

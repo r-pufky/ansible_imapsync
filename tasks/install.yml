@@ -1,0 +1,104 @@
+---
+###############################################################################
+# Install Packages & Services
+###############################################################################
+# Manually download, extract, and install packages according to Linux FHS
+# standards:
+#
+# Type    | Perms               | Path
+# --------|---------------------|-------
+# Source  | 0755/0644 root:root | /opt/imapsync
+# Runtime | 0755/0755 root:root | /usr/local/bin/imapsync
+#
+# Reference:
+# * https://imapsync.lamiral.info/INSTALL.d/INSTALL.Debian.txt
+
+- name: 'Install | filesystem | set system directories'
+  ansible.builtin.file:
+    path: '{{ imapsync___app._src_d }}'  # src_d includes opt_d.
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+    state: 'directory'
+
+- name: 'Install | packages'
+  ansible.builtin.include_role:
+    name: 'r_pufky.deb.apt'
+  vars:
+    apt_packages:
+      - '{{ imapsync___packages }}'
+    apt_srv_package_update_cache: true
+
+###############################################################################
+# imapsync
+###############################################################################
+
+- name: 'Install | filesystem | find previous installations'
+  ansible.builtin.find:
+    paths: '{{ imapsync___app._src_d }}'
+    file_type: 'directory'
+    recurse: false
+    excludes:
+      - '{{ imapsync__cfg._version }}'
+  register: imapsync__cmd
+
+- name: 'Install | filesystem | remove previous installations'
+  ansible.builtin.file:
+    path: '{{ item.path }}'
+    state: 'absent'
+  loop: '{{ imapsync__cmd.files }}'
+  loop_control:
+    label: '{{ item.path }}'
+
+- name: 'Install | url | 🗘 imapsync (~1 minute) 🗘'
+  when: not (molecule_flg_inject | default(false))
+  ansible.builtin.get_url:
+    url: '{{ imapsync__cfg._url }}'
+    dest: '{{ "/tmp/" ~ imapsync__cfg._package }}'
+    force: false
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    headers:
+      Authorization: '{{ imapsync__srv._token | default(omit) }}'
+  register: imapsync__cmd
+  until: imapsync__cmd is succeeded
+
+- name: '{{ "Install | filesystem | set " ~ imapsync__cfg._app_d }}'
+  ansible.builtin.file:
+    path: '{{ imapsync__cfg._app_d }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+    state: 'directory'
+
+- name: 'Install | filesystem | unpack imapsync'
+  ansible.builtin.unarchive:
+    creates: '{{ imapsync__cfg._app }}'
+    src: '{{ "/tmp/" ~ imapsync__cfg._package }}'
+    remote_src: true
+    dest: '{{ imapsync__cfg._app_d }}'
+    owner: 'root'
+    group: 'root'
+    mode: 'a-st'
+    extra_opts: ['--strip-components=1']
+    exclude:
+      - '.github'
+      - 'S'
+      - 'X'
+      - '.gitignore'
+      - 'CREDITS'
+      - 'index.shtml'
+      - 'paypal_return.shtml'
+      - 'README_Windows.txt'
+      - 'tests.sh'
+      - 'TODO'
+
+- name: 'Install | link binary'
+  ansible.builtin.file:
+    path: '{{ imapsync___app._bin }}'
+    src: '{{ imapsync__cfg._app }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+    state: 'hard'

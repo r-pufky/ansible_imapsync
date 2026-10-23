@@ -1,0 +1,86 @@
+---
+###############################################################################
+# Default imapsync Package Dependencies
+###############################################################################
+# Default required packages for imapsync install.
+#
+# Updates:
+# * KEEP a separate change log as changes are made.
+# * Use bare-metal docs to validate package/process changes.
+# * Update defaults.
+# * Update tests for any changes.
+# * Standard validation testing (yamllint, ansible-lint, to-do, no-qa).
+#
+# Reference:
+# * https://imapsync.lamiral.info/INSTALL.d/INSTALL.Debian.txt
+# * https://github.com/imapsync/imapsync
+
+imapsync___release: "{{ {} | r_pufky.data.v3(
+
+    _date='2026-10-23',
+    _debian='trixie',
+    _app='imapsync-2.314',
+  ) }}"
+
+###############################################################################
+# APT Packages
+###############################################################################
+
+imapsync___packages:
+  - 'libauthen-ntlm-perl'
+  - 'libcgi-pm-perl'
+  - 'libcrypt-openssl-rsa-perl'
+  - 'libdata-uniqid-perl'
+  - 'libencode-imaputf7-perl'
+  - 'libfile-copy-recursive-perl'
+  - 'libfile-tail-perl'
+  - 'libhttp-daemon-perl'
+  - 'libhttp-daemon-ssl-perl'
+  - 'libhttp-message-perl'
+  - 'libio-socket-inet6-perl'
+  - 'libio-socket-ssl-perl'
+  - 'libio-tee-perl'
+  - 'libhtml-parser-perl'
+  - 'libjson-webtoken-perl'
+  - 'libmail-imapclient-perl'
+  - 'libmodule-scandeps-perl'
+  - 'libnet-server-perl'
+  - 'libnet-dns-perl'
+  - 'libparse-recdescent-perl'
+  - 'libproc-processtable-perl'
+  - 'libreadonly-perl'
+  - 'libregexp-common-perl'
+  - 'libsys-meminfo-perl'
+  - 'libterm-readkey-perl'
+  - 'libtest-mockobject-perl'
+  - 'libunicode-string-perl'
+  - 'liburi-perl'
+  - 'libwww-perl'
+  - 'make'
+  - 'time'
+  - 'cpanminus'
+
+###############################################################################
+# imapsync
+###############################################################################
+# imapsync only tags versions, they do not create releases.
+#
+# Reference:
+# * https://github.com/imapsync/imapsync/tags
+
+imapsync___repo_url: 'https://github.com/imapsync/imapsync/archive/refs/tags/'
+imapsync___package: '{{ imapsync___release._app ~ ".tar.gz" }}'
+
+imapsync___app: "{{ {} | r_pufky.data.v3(
+
+    _version=imapsync___release._app,
+    _package=imapsync___package,
+    _url_base=imapsync___repo_url,
+    _url=imapsync___repo_url ~ imapsync___package,
+    _bin='/usr/local/bin/imapsync',
+    _opt_d='/opt/imapsync',
+
+    _src_d='/opt/imapsync/src',
+    _app_d='/opt/imapsync/src/' ~ imapsync___release._app,
+    _app='/opt/imapsync/src/' ~ imapsync___release._app ~ '/imapsync',
+  ) }}"

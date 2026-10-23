@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  role_name: 'imapsync'
+  author: 'r_pufky'
+  description: 'Imapsync'
+  company: 'N/A'
+  license: 'AGPL-3.0 License'
+  min_ansible_version: '2.20.0'
+
+  platforms:
+    - name: 'Debian'
+      versions:
+        - 'trixie'
+
+  galaxy_tags:
+    - 'imapsync'
+    - 'mail'
+    - 'email'
+    - 'imap'
+    - 'sync'
+
+dependencies: []

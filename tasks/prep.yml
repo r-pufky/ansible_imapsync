@@ -1,0 +1,25 @@
+---
+###############################################################################
+# Pre Execution Tasks
+###############################################################################
+# Only use data annotations in role after merging role, defaults, runtime data.
+#
+# Reference:
+# * https://imapsync.lamiral.info/INSTALL.d/INSTALL.Debian.txt
+
+- name: 'Prep | fact | record start time'
+  ansible.builtin.set_fact:
+    imapsync__srv: "{{ imapsync___release | r_pufky.data.v3(
+
+        _start=now(utc=True, fmt='%Y-%m-%dT%H%M%S'),
+        _token=imapsync_srv_token,
+      ) }}"
+    imapsync__cfg: "{{ {} | r_pufky.data.v3(
+
+        _version=imapsync_srv_version,
+        _url=imapsync___app._url_base ~ imapsync_srv_version,
+        _app_d=imapsync___app._src_d ~ '/' ~ imapsync_srv_version,
+        _app=imapsync___app._src_d ~ '/' ~ imapsync_srv_version ~ '/imapsync',
+        _package=imapsync_srv_version ~ '.tar.gz'
+
+      ) }}"

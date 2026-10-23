@@ -1,0 +1,56 @@
+---
+- name: 'Prepare'
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: 'Prepare | import role variables'
+      ansible.builtin.include_vars:
+        file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
+          }}'
+
+    - name: 'Prepare | cache'
+      ansible.builtin.include_role:
+        name: 'r_pufky.data.test'
+        tasks_from: 'create_cache.yml'
+      vars:
+        test_name: 'Prepare | cache'
+
+    - name: '{{
+          "Prepare | cache | imapsync " ~ imapsync___app._version
+        }}'
+      ansible.builtin.include_role:
+        name: 'r_pufky.data.test'
+        tasks_from: 'cache_url.yml'
+      vars:
+        test_name: '{{
+            "Prepare | cache | imapsync " ~ imapsync___app._version
+          }}'
+        test_dest: '{{ imapsync___app._package }}'
+        test_url: '{{ imapsync___app._url }}'
+        test_mode: '0640'
+
+- name: 'Prepare'
+  hosts: 'all'
+  gather_facts: false
+  tasks:
+    - name: 'Prepare | import role variables'
+      ansible.builtin.include_vars:
+        file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
+          }}'
+
+    - name: 'Prepare | inject | cached packages'
+      when: (molecule_flg_inject | default(false))
+      ansible.builtin.copy:
+        src: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/molecule/cache/" ~
+            item
+          }}'
+        dest: '{{ "/tmp/" ~ item }}'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+      loop:
+        - '{{ imapsync___app._package }}'

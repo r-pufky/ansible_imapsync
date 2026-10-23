@@ -1,0 +1,51 @@
+---
+###############################################################################
+# Feature Flags
+###############################################################################
+
+# 2. Install application?
+#
+# Creates required default directories, install packages, download software,
+# link and verify software working.
+#
+# Default: True.
+#
+imapsync_flg_install: true
+
+###############################################################################
+# Service
+###############################################################################
+
+# imapsync Release.
+#
+# Default: 'imapsync-2.314'.
+#
+# Reference:
+# * https://github.com/imapsync/imapsync/tags
+imapsync_srv_version: 'imapsync-2.314'
+
+# Github access token (imapsync).
+#
+# Unauthenticated (anonymous) API requests are heavily restricted to the sum
+# total of requests to github from a given IP. Use an access token if
+# receiving 403's.
+#
+# Classic Tokens:
+# * settings > developer settings > personal access tokens (classic)
+#   * notes: {LABEL APPROPRIATELY}
+#   * expiration: {CUSTOM}
+#   * scopes: NONE
+#
+# Fine-grained Tokens:
+# * settings > developer settings > personal access tokens (fine-grained)
+#   * token name: {LABEL APPROPRIATELY}
+#   * expiration: {CUSTOM}
+#   * description: {DESCRIPTIVE TEXT}
+#   * resource owner: {YOUR ACCOUNT}
+#   * repository access: Public Repositories (read-only)
+#
+# Default: '' (unauthenticated).
+#
+# Reference:
+# * https://docs.github.com/en/authentication
+imapsync_srv_token: ''
